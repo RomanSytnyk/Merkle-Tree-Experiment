@@ -1,0 +1,20 @@
+{
+  "name": "merkle-experiment",
+  "version": "1.0.0",
+  "description": "Experimental comparison: Application-Level Merkle Tree Verification vs MySQL+ECDSA for Supply Chain Data Integrity",
+  "scripts": {
+    "setup": "npx hardhat compile",
+    "experiment": "node src/run-experiment.js",
+    "blockchain-only": "node src/benchmark-blockchain.js",
+    "mysql-only": "node src/benchmark-mysql.js"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0",
+    "hardhat": "^2.22.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@openzeppelin/contracts": "^5.1.0",
+    "mysql2": "^3.11.0",
+    "elliptic": "^6.6.0",
+    "cli-table3": "^0.6.5"
+  }
+}

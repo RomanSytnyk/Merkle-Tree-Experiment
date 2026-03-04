@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.33
+    environment:
+      MYSQL_ROOT_PASSWORD: experiment2024
+      MYSQL_DATABASE: supply_chain
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - mysql_data:/var/lib/mysql
+    command: >
+      --innodb-buffer-pool-size=8589934592
+      --max-connections=100
+      --innodb-log-file-size=256M
+
+volumes:
+  mysql_data:
