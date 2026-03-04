@@ -85,4 +85,4 @@ Results printed to console and saved to `results.json`:
 
 ## License
 
-MIT
+Apache License 2.0
