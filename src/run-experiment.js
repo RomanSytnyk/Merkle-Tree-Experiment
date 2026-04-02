@@ -19,6 +19,7 @@ const envMode = (process.env.EXPERIMENT_MODE || 'full').toLowerCase();
 const blockchainOnly = envMode === 'blockchain';
 const mysqlOnly = envMode === 'mysql';
 const smallOnly = envMode === 'small';
+const sha256Only = envMode === 'sha256';
 const numRuns = parseInt(process.env.EXPERIMENT_RUNS || '10');
 
 let datasetSizes;
@@ -60,7 +61,11 @@ async function main() {
   console.log(`Configuration:`);
   console.log(`  Dataset sizes: ${datasetSizes.map(s => s.toLocaleString()).join(', ')} records`);
   console.log(`  Runs per test: ${numRuns}`);
-  console.log(`  Systems: ${blockchainOnly ? 'Blockchain only' : mysqlOnly ? 'MySQL only' : 'Both'}`);
+  const systemLabel = blockchainOnly ? 'Blockchain only'
+    : mysqlOnly ? 'MySQL only'
+    : sha256Only ? 'MySQL SHA-256-only'
+    : 'All (Blockchain + MySQL ECDSA + MySQL SHA-256)';
+  console.log(`  Systems: ${systemLabel}`);
   console.log(`  Date: ${new Date().toISOString()}`);
   console.log(`  Node: ${process.version}, Platform: ${process.platform} ${process.arch}\n`);
 
@@ -79,7 +84,7 @@ async function main() {
       }
     }
 
-    if (!blockchainOnly) {
+    if (!blockchainOnly && !sha256Only) {
       try {
         const { runBenchmark: runMySQL } = require('./benchmark-mysql');
         sizeResults.mysql = await runMySQL(size, numRuns);
@@ -97,6 +102,22 @@ async function main() {
       }
     }
 
+    if (!blockchainOnly && !mysqlOnly) {
+      try {
+        const { runBenchmark: runMySQLSHA256 } = require('./benchmark-mysql-sha256only');
+        sizeResults.mysqlSha256 = await runMySQLSHA256(size, numRuns);
+      } catch (err) {
+        console.error(`\n  MySQL SHA-256-only benchmark failed for ${size.toLocaleString()} records:`);
+        if (err.code === 'ECONNREFUSED') {
+          console.error('  MySQL is not running. Start it with:');
+          console.error('    docker compose up -d\n');
+        } else {
+          console.error(`  ${err.message}\n`);
+        }
+        sizeResults.mysqlSha256 = null;
+      }
+    }
+
     allResults.push(sizeResults);
   }
 
@@ -107,19 +128,23 @@ async function main() {
   console.log('╚' + '═'.repeat(66) + '╝\n');
 
   const table = new Table({
-    head: ['Dataset', 'MySQL (JOIN+ECDSA)', 'Blockchain (Merkle)', 'Ratio', 'Path'],
-    colWidths: [14, 24, 24, 9, 12],
+    head: ['Dataset', 'MySQL (JOIN+ECDSA)', 'MySQL (SHA-256)', 'Blockchain (Merkle)', 'ECDSA Ratio', 'SHA-256 Ratio', 'Path'],
+    colWidths: [12, 20, 20, 20, 13, 13, 10],
     style: { head: ['cyan'] },
   });
 
   for (const r of allResults) {
     const mysqlStr = r.mysql ? `${formatTime(r.mysql.meanSec)}` : '—';
+    const sha256Str = r.mysqlSha256 ? `${formatTime(r.mysqlSha256.meanSec)}` : '—';
     const bcStr = r.blockchain ? `${formatTime(r.blockchain.meanSec)}` : '—';
-    const ratio = (r.mysql && r.blockchain)
+    const ecdsaRatio = (r.mysql && r.blockchain)
       ? `${(r.mysql.meanMs / r.blockchain.meanMs).toFixed(1)}×`
       : '—';
+    const sha256Ratio = (r.mysqlSha256 && r.blockchain)
+      ? `${(r.mysqlSha256.meanMs / r.blockchain.meanMs).toFixed(1)}×`
+      : '—';
     const bcPath = r.blockchain ? r.blockchain.primaryPath : '—';
-    table.push([`${r.size.toLocaleString()}`, mysqlStr, bcStr, ratio, bcPath]);
+    table.push([`${r.size.toLocaleString()}`, mysqlStr, sha256Str, bcStr, ecdsaRatio, sha256Ratio, bcPath]);
   }
 
   console.log('Integrity verification time:\n');
@@ -133,8 +158,9 @@ async function main() {
     console.log(`  ${r.size.toLocaleString()} records:`);
 
     const systems = [];
-    if (r.blockchain) systems.push({ name: 'Blockchain', s: r.blockchain });
-    if (r.mysql) systems.push({ name: 'MySQL    ', s: r.mysql });
+    if (r.blockchain) systems.push({ name: 'Blockchain  ', s: r.blockchain });
+    if (r.mysql) systems.push({ name: 'MySQL ECDSA ', s: r.mysql });
+    if (r.mysqlSha256) systems.push({ name: 'MySQL SHA256', s: r.mysqlSha256 });
 
     for (const sys of systems) {
       const s = sys.s;
@@ -160,12 +186,17 @@ async function main() {
       if (curr.blockchain && prev.blockchain) {
         const timeRatio = curr.blockchain.meanMs / prev.blockchain.meanMs;
         const alpha = Math.log(timeRatio) / Math.log(dataRatio);
-        console.log(`    Blockchain: ${timeRatio.toFixed(2)}× time increase (α ≈ ${alpha.toFixed(2)})`);
+        console.log(`    Blockchain:    ${timeRatio.toFixed(2)}× time increase (α ≈ ${alpha.toFixed(2)})`);
       }
       if (curr.mysql && prev.mysql) {
         const timeRatio = curr.mysql.meanMs / prev.mysql.meanMs;
         const alpha = Math.log(timeRatio) / Math.log(dataRatio);
-        console.log(`    MySQL:      ${timeRatio.toFixed(2)}× time increase (α ≈ ${alpha.toFixed(2)})`);
+        console.log(`    MySQL ECDSA:   ${timeRatio.toFixed(2)}× time increase (α ≈ ${alpha.toFixed(2)})`);
+      }
+      if (curr.mysqlSha256 && prev.mysqlSha256) {
+        const timeRatio = curr.mysqlSha256.meanMs / prev.mysqlSha256.meanMs;
+        const alpha = Math.log(timeRatio) / Math.log(dataRatio);
+        console.log(`    MySQL SHA-256: ${timeRatio.toFixed(2)}× time increase (α ≈ ${alpha.toFixed(2)})`);
       }
       console.log();
     }
@@ -173,7 +204,13 @@ async function main() {
 
   // ── Save results ──
 
-  const outputPath = path.join(__dirname, '..', 'results.json');
+  const outputDir = path.join(__dirname, '..', 'results', 'hardhat');
+  fs.mkdirSync(outputDir, { recursive: true });
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const outputPath = path.join(outputDir, `results-${dateStr}.json`);
+
+  // Also write to legacy path for backwards compatibility
+  const legacyPath = path.join(__dirname, '..', 'results.json');
   const output = {
     meta: {
       date: new Date().toISOString(),
@@ -208,10 +245,17 @@ async function main() {
         stddevSec: r.mysql.stddevMs / 1000,
         allRunsSec: r.mysql.allRuns.map(x => x / 1000),
       } : null,
+      mysqlSha256: r.mysqlSha256 ? {
+        meanSec: r.mysqlSha256.meanSec,
+        medianSec: r.mysqlSha256.medianMs / 1000,
+        stddevSec: r.mysqlSha256.stddevMs / 1000,
+        allRunsSec: r.mysqlSha256.allRuns.map(x => x / 1000),
+      } : null,
     })),
   };
 
   fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
+  fs.writeFileSync(legacyPath, JSON.stringify(output, null, 2));
   console.log(`Results saved to: ${outputPath}`);
 
   console.log('\n' + '═'.repeat(68));

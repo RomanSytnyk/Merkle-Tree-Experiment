@@ -7,10 +7,12 @@
 #  for Supply Chain Data Integrity" (Sytnyk, Hnatushenko)
 #
 # Usage:
-#   ./run.sh              # Full experiment (blockchain + MySQL, 1000 + 10000 records)
+#   ./run.sh              # Full experiment (blockchain + MySQL ECDSA + MySQL SHA-256)
 #   ./run.sh blockchain   # Only blockchain benchmark (no Docker/MySQL needed)
-#   ./run.sh mysql        # Only MySQL benchmark
+#   ./run.sh mysql        # Only MySQL ECDSA benchmark
+#   ./run.sh sha256       # Only MySQL SHA-256 baseline (no ECDSA)
 #   ./run.sh small        # Quick run with 1000 records only
+#   ./run.sh l2           # L2 testnet benchmark (requires DEPLOYER_PRIVATE_KEY)
 #
 
 set -e
@@ -102,7 +104,7 @@ echo -e "\n${YELLOW}[2/4] Compiling Solidity contracts...${NC}"
 npx hardhat compile 2>&1 | tail -5
 
 # ── Step 3: Start MySQL (if needed) ──
-if [ "$MODE" != "blockchain" ]; then
+if [ "$MODE" != "blockchain" ] && [ "$MODE" != "l2" ]; then
   echo -e "\n${YELLOW}[3/4] Starting MySQL via Docker...${NC}"
   if command -v docker &> /dev/null; then
     if docker compose version &> /dev/null 2>&1; then
@@ -144,14 +146,38 @@ case $MODE in
   mysql)
     EXPERIMENT_MODE=mysql node src/run-experiment.js
     ;;
+  sha256)
+    EXPERIMENT_MODE=sha256 node src/run-experiment.js
+    ;;
   small)
     EXPERIMENT_MODE=small npx hardhat run src/run-experiment.js --network hardhat
     ;;
   full)
     EXPERIMENT_MODE=full npx hardhat run src/run-experiment.js --network hardhat
     ;;
+  l2)
+    if [ -z "$DEPLOYER_PRIVATE_KEY" ]; then
+      echo -e "${RED}ERROR: DEPLOYER_PRIVATE_KEY not set.${NC}"
+      echo ""
+      echo "  L2 testnet benchmark requires a funded Arbitrum Sepolia wallet."
+      echo ""
+      echo "  1. Create a wallet or use an existing one"
+      echo "  2. Get testnet ETH from:"
+      echo "       https://faucet.quicknode.com/arbitrum/sepolia"
+      echo "       https://www.alchemy.com/faucets/arbitrum-sepolia"
+      echo "  3. Run:"
+      echo "       DEPLOYER_PRIVATE_KEY=0x... ./run.sh l2"
+      echo ""
+      echo "  Optional:"
+      echo "       L2_DATASET_SIZE=100   (default: 100 records)"
+      echo "       L2_NUM_RUNS=10        (default: 10 verification runs)"
+      echo "       L2_BATCH_SIZE=100     (default: 100 leaves per tx)"
+      exit 1
+    fi
+    npx hardhat run src/benchmark-l2.js --network arbitrumSepolia
+    ;;
   *)
-    echo "Usage: ./run.sh [full|blockchain|mysql|small]"
+    echo "Usage: ./run.sh [full|blockchain|mysql|sha256|small|l2]"
     exit 1
     ;;
 esac

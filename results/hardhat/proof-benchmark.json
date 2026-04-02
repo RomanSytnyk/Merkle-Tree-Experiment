@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "date": "2026-04-01T19:51:44.496Z",
+    "numRuns": 100,
+    "warmupDropped": 2,
+    "platform": "darwin arm64",
+    "nodeVersion": "v25.6.1"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "proofDepth": 10,
+      "proofLength": 10,
+      "proofGenUs": 27.584,
+      "offChain": {
+        "meanUs": 409.4846632653061,
+        "stddevUs": 94.45095661355334,
+        "runs": 98
+      },
+      "onChain": {
+        "gas": 37220,
+        "meanUs": 356.69905555555556
+      }
+    },
+    {
+      "size": 10000,
+      "proofDepth": 14,
+      "proofLength": 14,
+      "proofGenUs": 12.459,
+      "offChain": {
+        "meanUs": 295.51195918367347,
+        "stddevUs": 44.79398693075843,
+        "runs": 98
+      },
+      "onChain": {
+        "gas": 42340,
+        "meanUs": 309.16905555555553
+      }
+    },
+    {
+      "size": 100000,
+      "proofDepth": 17,
+      "proofLength": 17,
+      "proofGenUs": 7.916,
+      "offChain": {
+        "meanUs": 393.9149693877552,
+        "stddevUs": 75.42686337866223,
+        "runs": 98
+      },
+      "onChain": {
+        "gas": 46060,
+        "meanUs": 376.30316666666664
+      }
+    }
+  ]
+}

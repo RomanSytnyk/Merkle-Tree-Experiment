@@ -8,6 +8,7 @@
 
 const crypto = require('crypto');
 const { ec: EC } = require('elliptic');
+const { keccak256, getAddress } = require('ethers');
 const ec = new EC('secp256k1');
 
 function generateDataset(numRecords, seed = 42) {
@@ -25,9 +26,9 @@ function generateDataset(numRecords, seed = 42) {
     const keyPair = ec.genKeyPair();
     const privKey = keyPair.getPrivate('hex');
     const pubKey = keyPair.getPublic('hex');
-    const pubKeyBytes = Buffer.from(pubKey, 'hex').slice(1);
-    const addressHash = crypto.createHash('sha256').update(pubKeyBytes).digest('hex');
-    const address = '0x' + addressHash.slice(0, 40);
+    const pubKeyBytes = Buffer.from(pubKey, 'hex').slice(1); // remove 0x04 prefix
+    const addressHash = keccak256(pubKeyBytes);
+    const address = getAddress('0x' + addressHash.slice(-40)); // EIP-55 checksum
 
     participants.push({
       id: i + 1,

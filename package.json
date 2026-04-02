@@ -6,7 +6,9 @@
     "setup": "npx hardhat compile",
     "experiment": "node src/run-experiment.js",
     "blockchain-only": "node src/benchmark-blockchain.js",
-    "mysql-only": "node src/benchmark-mysql.js"
+    "mysql-only": "node src/benchmark-mysql.js",
+    "mysql-sha256-only": "node src/benchmark-mysql-sha256only.js",
+    "l2-benchmark": "npx hardhat run src/benchmark-l2.js --network arbitrumSepolia"
   },
   "dependencies": {
     "ethers": "^6.13.0",

@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "date": "2026-04-01T17:20:28.796Z",
+    "network": "arbitrum-sepolia",
+    "chainId": 11155111,
+    "contract": "0xbe59B903532689324b3aE42FBf09Fe32D9756F0C",
+    "deployer": "0x4bBD34Cb92d3c7dF2dEA9ef2e674884937EFb83d",
+    "platform": "darwin arm64",
+    "nodeVersion": "v25.6.1"
+  },
+  "dataset": {
+    "numRecords": 1000,
+    "numLeaves": 1000,
+    "numOrders": 100
+  },
+  "gas": {
+    "deploy": "811140",
+    "leafStorage": "23357978",
+    "treeBuild": "3309736",
+    "total": "27478854",
+    "ethSpent": "0.000041066513893733",
+    "deployTxHash": "0xd243c30c4006d283dcf811ae8baf1b7a6f71fd406e306a29c81f4a26dd4f58a3",
+    "storageTxHashes": [
+      "0xaba76d5adb5c22946e725ea42a051691b1f5a8cd1213f3da4c90b0e8bae028de",
+      "0x9ecb95eac6477bf3cd21c1f6c38b7a419490c055ab65e43f35d4784ff2af9aaa",
+      "0x5a07146a91f99fd397d4d3f8ced50af7f257f34ff5174922a3af358a17e04485",
+      "0x94fe5c2048155c311160181b217b8beaa188fefd07d6483bd4e64b3492981792",
+      "0x3f4a9e62f1af171545ab3a9d10cbe8b114d866331390a98558720706775cc9ba",
+      "0x2363a7dbcba8c9cd0c61b9e499086cd8dbc8466ab8fc43fff9f8a2f4d426e3f3",
+      "0x09b5770b82e8791d3f0290ece519e953883ef1c1447805a89276fcc3d56d06e6",
+      "0x619f64bffce341a209ebe948b943830779c5b78cf701dfb2e4a28e162403c0d9",
+      "0x2aa96bbb8d244ae834a01bc79c1b77d9c1bbfba6d5743c6569822ab7aa00f4c1",
+      "0x292e57a09e79e98872e1fdae10364edaf8eaa32fd64a7963482b4086a52a0748"
+    ],
+    "buildTxHash": "0x073b8e9ec240cc41d5b6e5e6d65050aa85f9c51419d9568a41c3592e72facaf9"
+  },
+  "crossValidation": {
+    "onChainRoot": "0xc45a585a8bbd9f1f4b77feaebdfcf93debd55fa293b0f7d2b83014a839dae7c4",
+    "offChainRoot": "0xc45a585a8bbd9f1f4b77feaebdfcf93debd55fa293b0f7d2b83014a839dae7c4",
+    "match": true
+  },
+  "verification": {
+    "offChain": {
+      "meanMs": 101.8856084,
+      "medianMs": 92.002292,
+      "stddevMs": 29.353682410424287,
+      "allRunsMs": [
+        184.052917,
+        100.770667,
+        92.002292,
+        101.148541,
+        96.806709,
+        91.653458,
+        87.249833,
+        88.594042,
+        85.768333,
+        90.809292
+      ]
+    },
+    "onChainView": {
+      "meanMs": 60.43675,
+      "medianMs": 53.203084,
+      "stddevMs": 20.09380589260272,
+      "allRunsMs": [
+        60.403333,
+        60.50575,
+        50.69775,
+        116.586583,
+        51.727125,
+        51.863458,
+        57.067625,
+        51.829375,
+        53.203084,
+        50.483417
+      ],
+      "note": "Includes RPC round-trip latency"
+    },
+    "numRuns": 10
+  }
+}
