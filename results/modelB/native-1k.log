@@ -1,0 +1,31 @@
+
+============================================================
+  MYSQL NATIVE-ECDSA BENCHMARK: 1,000 records, 10 runs
+  (verify: node:crypto / OpenSSL secp256k1)
+============================================================
+
+Generated 1,000 records across 100 orders
+Cross-library self-test: OK
+Connected to MySQL.
+
+Populating database...
+Database populated: 1000 location records
+
+Running 10 verification measurements (+2 warm-up)...
+
+  Run  1:    0.314 s | Verified: 2199/2199 (100.0%)
+  Run  2:    0.312 s | Verified: 2199/2199 (100.0%)
+  Run  3:    0.311 s | Verified: 2199/2199 (100.0%)
+  Run  4:    0.312 s | Verified: 2199/2199 (100.0%)
+  Run  5:    0.310 s | Verified: 2199/2199 (100.0%)
+  Run  6:    0.313 s | Verified: 2199/2199 (100.0%)
+  Run  7:    0.312 s | Verified: 2199/2199 (100.0%)
+  Run  8:    0.313 s | Verified: 2199/2199 (100.0%)
+  Run  9:    0.313 s | Verified: 2199/2199 (100.0%)
+  Run 10:    0.313 s | Verified: 2199/2199 (100.0%)
+
+────────────────────────────────────────
+  Mean:   0.312 s
+  Median: 0.313 s
+  StdDev: 0.001 s
+────────────────────────────────────────

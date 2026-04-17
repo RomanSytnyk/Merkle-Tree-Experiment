@@ -1,0 +1,32 @@
+
+============================================================
+  MYSQL BENCHMARK: 10,000 records, 10 runs
+============================================================
+
+Generated 10,000 records across 994 orders
+Connected to MySQL.
+
+Initializing database schema...
+Populating database...
+Database populated: 10000 location records
+
+Running 10 verification measurements...
+
+  Run  1:   16.731 s | Verified: 21986/21986 (100.0%)
+  Run  2:   16.947 s | Verified: 21986/21986 (100.0%)
+  Run  3:   17.067 s | Verified: 21986/21986 (100.0%)
+  Run  4:   17.424 s | Verified: 21986/21986 (100.0%)
+  Run  5:   17.052 s | Verified: 21986/21986 (100.0%)
+  Run  6:   17.067 s | Verified: 21986/21986 (100.0%)
+  Run  7:   16.993 s | Verified: 21986/21986 (100.0%)
+  Run  8:   16.986 s | Verified: 21986/21986 (100.0%)
+  Run  9:   16.981 s | Verified: 21986/21986 (100.0%)
+  Run 10:   16.985 s | Verified: 21986/21986 (100.0%)
+
+────────────────────────────────────────
+  Mean:   17.023 s
+  Median: 16.993 s
+  StdDev: 0.171 s
+  Min:    16.731 s
+  Max:    17.424 s
+────────────────────────────────────────

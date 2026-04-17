@@ -1,0 +1,32 @@
+
+============================================================
+  MYSQL SHA-256-ONLY BENCHMARK: 1,000 records, 10 runs
+============================================================
+
+Generated 1,000 records across 100 orders
+Connected to MySQL.
+
+Initializing database schema...
+Populating database...
+Database populated: 1000 location records
+
+Running 10 SHA-256-only verification measurements...
+
+  Run  1:    0.015 s | Verified: 2199/2199 (100.0%)
+  Run  2:    0.011 s | Verified: 2199/2199 (100.0%)
+  Run  3:    0.013 s | Verified: 2199/2199 (100.0%)
+  Run  4:    0.008 s | Verified: 2199/2199 (100.0%)
+  Run  5:    0.008 s | Verified: 2199/2199 (100.0%)
+  Run  6:    0.008 s | Verified: 2199/2199 (100.0%)
+  Run  7:    0.009 s | Verified: 2199/2199 (100.0%)
+  Run  8:    0.007 s | Verified: 2199/2199 (100.0%)
+  Run  9:    0.008 s | Verified: 2199/2199 (100.0%)
+  Run 10:    0.008 s | Verified: 2199/2199 (100.0%)
+
+────────────────────────────────────────
+  Mean:   0.009 s
+  Median: 0.008 s
+  StdDev: 0.003 s
+  Min:    0.007 s
+  Max:    0.015 s
+────────────────────────────────────────
